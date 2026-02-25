@@ -7,13 +7,15 @@ interface TaskListProps {
   filter: Filter;
   onFilterChange(filter: Filter): void;
   onToggle(taskId: string): void;
+  onDelete(taskId: string): void;
 }
 
 export function TaskList({
   tasks,
   filter,
   onFilterChange,
-  onToggle
+  onToggle,
+  onDelete
 }: TaskListProps) {
   const filteredTasks = tasks.filter((task) => {
     if (filter === 'pending') return !task.completed;
@@ -21,14 +23,53 @@ export function TaskList({
     return true;
   });
 
+  const parseIsoToLocalDate = (value: string) => {
+    const [y, m, d] = value.split('-').map(Number);
+    if (y && m && d) return new Date(y, m - 1, d);
+    return new Date(value);
+  };
+
   const formatDate = (value?: string) => {
     if (!value) return '';
     try {
-      const date = new Date(value);
+      const date = parseIsoToLocalDate(value);
       return date.toLocaleDateString('pt-BR');
     } catch {
       return value;
     }
+  };
+
+  const getDueDateBadge = (value?: string) => {
+    if (!value) return null;
+
+    const parsed = parseIsoToLocalDate(value);
+    if (Number.isNaN(parsed.getTime())) {
+      return { label: value, className: 'neutral' as const };
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dateOnly = new Date(parsed);
+    dateOnly.setHours(0, 0, 0, 0);
+
+    if (dateOnly.getTime() < today.getTime()) {
+      return {
+        label: `Atrasada · ${formatDate(value)}`,
+        className: 'overdue' as const
+      };
+    }
+
+    if (dateOnly.getTime() === today.getTime()) {
+      return {
+        label: 'Hoje',
+        className: 'today' as const
+      };
+    }
+
+    return {
+      label: `Até ${formatDate(value)}`,
+      className: 'future' as const
+    };
   };
 
   const getPriorityLabel = (priority: Task['priority']) => {
@@ -72,25 +113,39 @@ export function TaskList({
         <ul>
           {filteredTasks.map((task) => (
             <li key={task.id} className={task.completed ? 'completed' : ''}>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={task.completed}
-                  onChange={() => onToggle(task.id)}
-                />
-                <span className="task-title">{task.title}</span>
-              </label>
+              <div className="task-main">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={task.completed}
+                    onChange={() => onToggle(task.id)}
+                  />
+                  <span className="task-title">{task.title}</span>
+                </label>
+                <button
+                  type="button"
+                  className="icon-button delete-button"
+                  aria-label="Excluir tarefa"
+                  onClick={() => onDelete(task.id)}
+                >
+                  ✕
+                </button>
+              </div>
               <div className="task-meta">
                 {task.priority && (
                   <span className={`priority ${task.priority}`}>
                     {getPriorityLabel(task.priority)}
                   </span>
                 )}
-                {task.dueDate && (
-                  <span className="due-date">
-                    Vence em {formatDate(task.dueDate)}
-                  </span>
-                )}
+                {(() => {
+                  const badge = getDueDateBadge(task.dueDate);
+                  if (!badge) return null;
+                  return (
+                    <span className={`due-date ${badge.className}`}>
+                      {badge.label}
+                    </span>
+                  );
+                })()}
               </div>
               {task.description && (
                 <p className="task-description">{task.description}</p>

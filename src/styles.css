@@ -30,6 +30,38 @@ body {
   color: transparent;
 }
 
+.tabs {
+  display: inline-flex;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+  box-shadow: 0 10px 25px -10px rgba(15, 23, 42, 0.9);
+  margin: 0 auto 1.5rem;
+}
+
+.tab-button {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  padding: 0.4rem 1.2rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+}
+
+.tab-button.active {
+  background: radial-gradient(circle at top left, #38bdf8, #6366f1);
+  color: #0b1120;
+  font-weight: 600;
+}
+
+.tab-panels {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 .new-task-form {
   background: #020617;
   border-radius: 0.75rem;
@@ -70,6 +102,10 @@ select {
   color: #e5e7eb;
   padding: 0.5rem 0.75rem;
   font-size: 0.95rem;
+}
+
+.datepicker-input {
+  width: 100%;
 }
 
 input:focus,
@@ -162,6 +198,13 @@ textarea {
   border-bottom: none;
 }
 
+.task-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
 .task-list li.completed .task-title {
   text-decoration: line-through;
   color: #6b7280;
@@ -221,10 +264,81 @@ textarea {
   color: #7dd3fc;
 }
 
+.due-date {
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.1);
+  color: #e5e7eb;
+}
+
+.due-date.overdue {
+  background: rgba(248, 113, 113, 0.16);
+  color: #fecaca;
+}
+
+.due-date.today {
+  background: rgba(52, 211, 153, 0.16);
+  color: #6ee7b7;
+}
+
+.due-date.future {
+  background: rgba(56, 189, 248, 0.16);
+  color: #7dd3fc;
+}
+
 .task-description {
   margin: 0.25rem 0 0;
   font-size: 0.85rem;
   color: #d1d5db;
+}
+
+.icon-button {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #6b7280;
+  padding: 0.1rem 0.4rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.icon-button.delete-button:hover {
+  color: #fecaca;
+  border-color: rgba(248, 113, 113, 0.5);
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.quick-date-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.quick-date-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+}
+
+.chip-button {
+  border-radius: 999px;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  background: rgba(15, 23, 42, 0.8);
+  color: #e5e7eb;
+  padding: 0.15rem 0.65rem;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.chip-button.subtle {
+  opacity: 0.8;
+}
+
+.chip-button:hover {
+  border-color: #38bdf8;
 }
 
 .quick-date-row {

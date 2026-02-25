@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import type { Priority, Task } from '../models/task';
 import { createTask } from '../models/task';
 
@@ -12,6 +14,33 @@ export function NewTaskForm({ onCreate }: NewTaskFormProps) {
   const [dueDate, setDueDate] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
   const [error, setError] = useState<string | null>(null);
+
+  const isoToLocalDate = (iso: string) => {
+    const [y, m, d] = iso.split('-').map(Number);
+    if (!y || !m || !d) return null;
+    return new Date(y, m - 1, d);
+  };
+
+  const localDateToIso = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleQuickDate = (type: 'today' | 'tomorrow' | 'none') => {
+    if (type === 'none') {
+      setDueDate('');
+      return;
+    }
+
+    const base = new Date();
+    if (type === 'tomorrow') {
+      base.setDate(base.getDate() + 1);
+    }
+
+    setDueDate(localDateToIso(base));
+  };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -29,7 +58,7 @@ export function NewTaskForm({ onCreate }: NewTaskFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="new-task-form">
+    <form onSubmit={handleSubmit} className="new-task-form" noValidate>
       <div className="field">
         <label htmlFor="title">Título *</label>
         <input
@@ -54,12 +83,45 @@ export function NewTaskForm({ onCreate }: NewTaskFormProps) {
       <div className="field-row">
         <div className="field">
           <label htmlFor="dueDate">Data de vencimento</label>
-          <input
+          <DatePicker
             id="dueDate"
-            type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
+            selected={dueDate ? isoToLocalDate(dueDate) : null}
+            onChange={(date) => {
+              if (!date) {
+                setDueDate('');
+                return;
+              }
+              setDueDate(localDateToIso(date));
+            }}
+            minDate={new Date(new Date().setHours(0, 0, 0, 0))}
+            placeholderText="Selecione uma data"
+            className="datepicker-input"
+            dateFormat="dd/MM/yyyy"
           />
+          <div className="quick-date-row">
+            <span className="quick-date-label">Atalhos:</span>
+            <button
+              type="button"
+              className="chip-button"
+              onClick={() => handleQuickDate('today')}
+            >
+              Hoje
+            </button>
+            <button
+              type="button"
+              className="chip-button"
+              onClick={() => handleQuickDate('tomorrow')}
+            >
+              Amanhã
+            </button>
+            <button
+              type="button"
+              className="chip-button subtle"
+              onClick={() => handleQuickDate('none')}
+            >
+              Sem data
+            </button>
+          </div>
         </div>
 
         <div className="field">

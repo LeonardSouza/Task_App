@@ -4,9 +4,11 @@ import react from '@vitejs/plugin-react-swc';
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
+    environment: 'happy-dom',
     setupFiles: ['./vitest.setup.ts'],
-    globals: true
+    globals: true,
+    include: ['src/**/*.test.{ts,tsx}'],
+    exclude: ['**/node_modules/**', '.aios-core/**']
   }
 });
 
